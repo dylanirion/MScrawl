@@ -40,11 +40,12 @@
 #' 
 #' @importFrom MASS mvrnorm
 #' @importFrom stats dnorm runif rnorm rexp rgamma
+#' @importFrom parallel mclapply
 #' @export
 #' 
 #' @useDynLib MScrawl
 runMCMC <- function(track, nbStates, nbIter, inits, priors, props, tunes, kalmanpars,
-                    updateState=TRUE)
+                    updateState=TRUE, mc.cores = 1)
 {
     
     ######################
@@ -130,7 +131,7 @@ runMCMC <- function(track, nbStates, nbIter, inits, priors, props, tunes, kalman
     }
     
     # initial likelihood
-    oldllk <- lapply( ids, function( id ) { kalman_rcpp( data = data[[ id ]], param = param, Hmat = HmatAll[[ id ]], a0 = a0[[ id ]], P0 = P0[[ id ]] ) } )
+    oldllk <- mclapply( ids, function( id ) { kalman_rcpp( data = data[[ id ]], param = param, Hmat = HmatAll[[ id ]], a0 = a0[[ id ]], P0 = P0[[ id ]] ) }, mc.cores = mc.cores )
     names(oldllk) <- ids
     
     # initial log-prior
@@ -203,7 +204,7 @@ runMCMC <- function(track, nbStates, nbIter, inits, priors, props, tunes, kalman
         
         # Calculate acceptance ratio
         
-        newllk <- lapply( ids, function( id ) { kalman_rcpp( data = data[[ id ]], param = c( betaprime, sigmaprime ), Hmat = HmatAll[[ id ]], a0 = a0[[ id ]], P0 = P0[[ id ]] ) } )
+        newllk <- mclapply( ids, function( id ) { kalman_rcpp( data = data[[ id ]], param = c( betaprime, sigmaprime ), Hmat = HmatAll[[ id ]], a0 = a0[[ id ]], P0 = P0[[ id ]] ) }, mc.cores = mc.cores )
         names(newllk) <- ids
         logHR <- do.call( 'sum', newllk ) + newlogprior - do.call( 'sum', oldllk ) - oldlogprior
 
