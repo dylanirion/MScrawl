@@ -131,7 +131,8 @@ runMCMC <- function(track, nbStates, nbIter, inits, priors, props, tunes, kalman
     
     # initial likelihood
     oldllk <- lapply( ids, function( id ) { kalman_rcpp( data = data[[ id ]], param = param, Hmat = HmatAll[[ id ]], a0 = a0[[ id ]], P0 = P0[[ id ]] ) } )
-    oldllk <- do.call( 'sum', oldllk )
+    names(oldllk) <- ids
+    
     # initial log-prior
     oldlogprior <- sum( dnorm( log( param ), priorMean, priorSD, log = TRUE ) )
     
@@ -173,9 +174,9 @@ runMCMC <- function(track, nbStates, nbIter, inits, priors, props, tunes, kalman
             newHmatAll[[ id ]][ which( !is.na( newData[[ id ]] [ , "x" ] ) ), ] <- Hmat[ which( track$ID == id ), ] 
             
             # Calculate acceptance ratio
-            newllk <- lapply( ids, function( id ) { kalman_rcpp( data = newData[[ id ]], param = param, Hmat = newHmatAll[[ id ]], a0 = a0[[ id ]], P0 = P0[[ id ]] ) } )
-            newllk <- do.call( 'sum', newllk )
-            logHR <- newllk - oldllk
+            newllk <- oldllk
+            newllk[[ id ]] <- kalman_rcpp( data = newData[[ id ]], param = param, Hmat = newHmatAll[[ id ]], a0 = a0[[ id ]], P0 = P0[[ id ]] )
+            logHR <- do.call( 'sum', newllk ) - do.call( 'sum', oldllk )
             
             if(log(runif(1))<logHR) {
                 # Accept new state sequence
@@ -201,9 +202,10 @@ runMCMC <- function(track, nbStates, nbIter, inits, priors, props, tunes, kalman
         sigmaprime <- exp(sigmaprimeW)
         
         # Calculate acceptance ratio
+        
         newllk <- lapply( ids, function( id ) { kalman_rcpp( data = data[[ id ]], param = c( betaprime, sigmaprime ), Hmat = HmatAll[[ id ]], a0 = a0[[ id ]], P0 = P0[[ id ]] ) } )
-        newllk <- do.call( 'sum', newllk )
-        logHR <- newllk + newlogprior - oldllk - oldlogprior
+        names(newllk) <- ids
+        logHR <- do.call( 'sum', newllk ) + newlogprior - do.call( 'sum', oldllk ) - oldlogprior
 
         if(log(runif(1))<logHR) {
             # Accept new parameter values
