@@ -140,7 +140,7 @@ runMCMC <- function(track, nbStates, nbIter, inits, priors, props, tunes, kalman
     ###############################
     allparam <- matrix(NA,nrow=nbIter,ncol=2*nbStates)
     allrates <- array( NA, dim = c( nbIter, nbStates*(nbStates-1), length( ids ) ) )
-    allstates <- matrix(NA,nrow=nbIter/thinStates,ncol=nbObs) # uses a lot of memory!
+    allstates <- matrix( NA, nrow = nbIter / thinStates, ncol = nrow( track ) ) # uses a lot of memory!
     accSwitch <- rep(0,nbIter)
     accParam <- rep(0,nbIter)
     allLen <- rep(NA,nbIter)
