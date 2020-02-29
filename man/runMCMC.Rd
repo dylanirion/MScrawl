@@ -4,11 +4,21 @@
 \alias{runMCMC}
 \title{Run MCMC iterations}
 \usage{
-runMCMC(track, nbStates, nbIter, inits, priors, props, tunes, kalmanpars,
-  updateState = TRUE)
+runMCMC(
+  track,
+  nbStates,
+  nbIter,
+  inits,
+  priors,
+  props,
+  tunes,
+  kalmanpars,
+  updateState = TRUE,
+  mc.cores = 1
+)
 }
 \arguments{
-\item{track}{Dataframe of data, with columns "x", "y", and "time"}
+\item{track}{Dataframe of data, with columns "x", "y", "time", and "ID"}
 
 \item{nbStates}{Number of states}
 
@@ -46,8 +56,8 @@ of memory limitations)
 \itemize{
   \item{"Hmat":} Matrix of observation error variance (four columns, and one row 
 for each row of data)
-  \item{"a0":} Initial state estimate vector
-  \item{"P0":} Initial estimate covariance matrix
+  \item{"a0":} List of initial state estimate vectors, named for each individual
+  \item{"P0":} List of initial estimate covariance matrices, named for each individual
 }}
 
 \item{updateState}{Logical. If FALSE, the state process is not updated

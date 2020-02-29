@@ -10,6 +10,6 @@ Description: Extends the R package crawl (Johnson et al., 2008) to
     into multistate continous-time correlated random walks, for the 
     analysis of animal movement data.
 License: GPL-3
-Imports: Rcpp (>= 0.12.16), ECctmc, gtools, MASS
+Imports: Rcpp (>= 0.12.16), ECctmc, gtools, MASS, parallel
 LinkingTo: Rcpp, RcppArmadillo
-RoxygenNote: 6.0.1
+RoxygenNote: 7.0.2
